@@ -195,6 +195,7 @@ def report_CEA_CBA(sim_outcomes_mono, sim_outcomes_combo):
 
 
 def show_ce_figure(CEA):
+
     # create a cost-effectiveness plot
     plt.figure(figsize=(5, 5))
 
