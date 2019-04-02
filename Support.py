@@ -219,7 +219,7 @@ def show_ce_figure(CEA):
                     c=s.color,      # color
                     alpha=1,        # transparency
                     marker='o',     # markers
-                    s=100,          # marker size
+                    s=75,          # marker size
                     label=s.name    # name to show in the legend
                     )
 
