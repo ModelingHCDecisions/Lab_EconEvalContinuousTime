@@ -38,14 +38,17 @@ class ParametersFixed:
         self.rateMatrix = []
 
         # calculate transition probabilities between hiv states
+
+        prob_matrix_mono = get_prob_matrix(trans_matrix=Data.TRANS_MATRIX)
+
         if self.therapy == Therapies.MONO:
             # calculate transition probability matrix for the mono therapy
-            self.rateMatrix = get_rate_matrix_mono(trans_matrix=Data.TRANS_MATRIX)
+            self.rateMatrix = get_rate_matrix_mono(trans_prob_matrix=prob_matrix_mono)
 
         elif self.therapy == Therapies.COMBO:
             # calculate transition probability matrix for the combination therapy
             self.rateMatrix = get_rate_matrix_combo(
-                rate_matrix_mono=get_rate_matrix_mono(trans_matrix=Data.TRANS_MATRIX),
+                rate_matrix_mono=get_rate_matrix_mono(trans_prob_matrix=prob_matrix_mono),
                 combo_rr=Data.TREATMENT_RR)
 
         # annual state costs and utilities
@@ -75,10 +78,7 @@ def get_prob_matrix(trans_matrix):
     return trans_prob_matrix
 
 
-def get_rate_matrix_mono(trans_matrix):
-
-    # find the transition probability matrix
-    trans_prob_matrix = get_prob_matrix(trans_matrix=trans_matrix)
+def get_rate_matrix_mono(trans_prob_matrix):
 
     # find the transition rate matrix
     trans_rate_matrix = Markov.discrete_to_continuous(
