@@ -83,7 +83,7 @@ def plot_survival_curves_and_histograms(sim_outcomes_mono, sim_outcomes_combo):
         x_label='Survival time (year)',
         y_label='Counts',
         bin_width=1,
-        legend=['Mono Therapy', 'Combination Therapy'],
+        legends=['Mono Therapy', 'Combination Therapy'],
         transparency=0.6
     )
 
