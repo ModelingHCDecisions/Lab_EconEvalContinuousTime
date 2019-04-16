@@ -159,6 +159,9 @@ class Cohort:
         # store outputs of this simulation
         self.cohortOutcomes.extract_outcomes(self.patients)
 
+        # clear patients
+        self.patients.clear()
+
 
 class CohortOutcomes:
     def __init__(self):
