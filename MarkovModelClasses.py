@@ -1,9 +1,9 @@
-import ParameterClasses as P
+from InputData import HealthStates
 import SimPy.RandomVariantGenerators as RVGs
-import SimPy.SamplePathClasses as Path
-import SimPy.EconEvalClasses as Econ
-import SimPy.StatisticalClasses as Stat
 import SimPy.MarkovClasses as Markov
+import SimPy.SamplePathClasses as Path
+import SimPy.EconEval as Econ
+import SimPy.StatisticalClasses as Stat
 
 
 class Patient:
@@ -13,24 +13,28 @@ class Patient:
         :param parameters: an instance of the parameters class
         """
         self.id = id
-        self.rng = RVGs.RNG(seed=id)  # random number generator for this patient
         self.params = parameters
-        # gillespie algorithm
-        self.gillespie = Markov.Gillespie(transition_rate_matrix=parameters.rateMatrix)
         self.stateMonitor = PatientStateMonitor(parameters=parameters)  # patient state monitor
 
     def simulate(self, sim_length):
         """ simulate the patient over the specified simulation length """
+
+        # random number generator for this patient
+        rng = RVGs.RNG(seed=self.id)
+        # gillespie algorithm
+        gillespie = Markov.Gillespie(transition_rate_matrix=self.params.rateMatrix)
 
         t = 0  # simulation time
         if_stop = False
 
         while not if_stop:
 
-            # find time to next event, and next state
-            dt, new_state_index = self.gillespie.get_next_state(
+            # find time until next event (dt), and next state
+            # (note that the gillespie algorithm returns None for dt if the process
+            # is in an absorbing state)
+            dt, new_state_index = gillespie.get_next_state(
                 current_state_index=self.stateMonitor.currentState.value,
-                rng=self.rng)
+                rng=rng)
 
             # stop if time to next event (dt) is None
             if dt is None:
@@ -39,7 +43,7 @@ class Patient:
             # else if  the next event occurs beyond simulation length
             elif dt + t > sim_length:
                 if_stop = True
-                # collect cost and health outcomes
+                # collect cost and health outcomes up to the simulation length
                 self.stateMonitor.costUtilityMonitor.update(time=sim_length,
                                                             current_state=self.stateMonitor.currentState,
                                                             next_state=self.stateMonitor.currentState)
@@ -47,7 +51,7 @@ class Patient:
                 # advance time to the time of next event
                 t += dt
                 # update health state
-                self.stateMonitor.update(time=t, new_state=P.HealthStates(new_state_index))
+                self.stateMonitor.update(time=t, new_state=HealthStates(new_state_index))
 
 
 class PatientStateMonitor:
@@ -69,11 +73,11 @@ class PatientStateMonitor:
         """
 
         # update survival time
-        if new_state == P.HealthStates.HIV_DEATH or P.HealthStates.NATUAL_DEATH:
+        if new_state in (HealthStates.HIV_DEATH, HealthStates.NATUAL_DEATH):
             self.survivalTime = time
 
         # update time until AIDS
-        if self.currentState != P.HealthStates.AIDS and new_state == P.HealthStates.AIDS:
+        if self.currentState != HealthStates.AIDS and new_state == HealthStates.AIDS:
             self.ifDevelopedAIDS = True
             self.timeToAIDS = time
 
@@ -136,7 +140,6 @@ class Cohort:
         self.id = id
         self.popSize = pop_size
         self.params = parameters
-        self.patients = []  # list of patients
         self.cohortOutcomes = CohortOutcomes()  # outcomes of the this simulated cohort
 
     def simulate(self, sim_length):
@@ -145,22 +148,20 @@ class Cohort:
         """
 
         # populate the cohort
+        patients = []
         for i in range(self.popSize):
             # create a new patient (use id * pop_size + n as patient id)
             patient = Patient(id=self.id * self.popSize + i, parameters=self.params)
             # add the patient to the cohort
-            self.patients.append(patient)
+            patients.append(patient)
 
         # simulate all patients
-        for patient in self.patients:
+        for patient in patients:
             # simulate
             patient.simulate(sim_length)
 
         # store outputs of this simulation
-        self.cohortOutcomes.extract_outcomes(self.patients)
-
-        # clear patients
-        self.patients.clear()
+        self.cohortOutcomes.extract_outcomes(patients)
 
 
 class CohortOutcomes:

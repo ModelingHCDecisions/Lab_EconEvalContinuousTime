@@ -1,3 +1,4 @@
+from enum import Enum
 
 # simulation settings
 POP_SIZE = 1000     # cohort population size
@@ -6,6 +7,16 @@ ALPHA = 0.05        # significance level for calculating confidence intervals
 DISCOUNT = 0.03     # annual discount rate
 # annual probability of background mortality (number per year per 1,000 population)
 ANNUAL_PROB_BACKGROUND_MORT = 8.15 / 1000
+
+
+class HealthStates(Enum):
+    """ health states of patients with HIV """
+    CD4_200to500 = 0
+    CD4_200 = 1
+    AIDS = 2
+    HIV_DEATH = 3
+    NATUAL_DEATH = 4
+
 
 # transition matrix
 TRANS_MATRIX = [
