@@ -2,7 +2,7 @@ from enum import Enum
 import numpy as np
 import InputData as Data
 from InputData import HealthStates
-import SimPy.MarkovClasses as Markov
+import SimPy.Markov as Markov
 
 
 class Therapies(Enum):
@@ -30,15 +30,15 @@ class ParametersFixed:
         prob_matrix_mono = get_trans_prob_matrix(trans_matrix=Data.TRANS_MATRIX)
 
         # transition probability matrix of the selected therapy
-        self.rateMatrix = []
+        self.transRateMatrix = []
 
         if self.therapy == Therapies.MONO:
             # calculate transition rate matrix for the mono therapy
-            self.rateMatrix = get_trans_rate_matrix(trans_prob_matrix=prob_matrix_mono)
+            self.transRateMatrix = get_trans_rate_matrix(trans_prob_matrix=prob_matrix_mono)
 
         elif self.therapy == Therapies.COMBO:
             # calculate transition probability matrix for the combination therapy
-            self.rateMatrix = get_trans_rate_matrix_combo(
+            self.transRateMatrix = get_trans_rate_matrix_combo(
                 rate_matrix_mono=get_trans_rate_matrix(trans_prob_matrix=prob_matrix_mono),
                 combo_rr=Data.TREATMENT_RR)
 

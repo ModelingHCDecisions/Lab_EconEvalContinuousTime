@@ -1,9 +1,10 @@
+import numpy as np
+
+import SimPy.Markov as Markov
+import SimPy.SamplePath as Path
 from InputData import HealthStates
-import SimPy.RandomVariantGenerators as RVGs
-import SimPy.MarkovClasses as Markov
-import SimPy.SamplePathClasses as Path
 import SimPy.EconEval as Econ
-import SimPy.StatisticalClasses as Stat
+import SimPy.Statistics as Stat
 
 
 class Patient:
@@ -20,15 +21,14 @@ class Patient:
         """ simulate the patient over the specified simulation length """
 
         # random number generator for this patient
-        rng = RVGs.RNG(seed=self.id)
+        rng = np.random.RandomState(seed=self.id)
         # gillespie algorithm
-        gillespie = Markov.Gillespie(transition_rate_matrix=self.params.rateMatrix)
+        gillespie = Markov.Gillespie(transition_rate_matrix=self.params.transRateMatrix)
 
         t = 0  # simulation time
         if_stop = False
 
         while not if_stop:
-
             # find time until next event (dt), and next state
             # (note that the gillespie algorithm returns None for dt if the process
             # is in an absorbing state)
@@ -36,20 +36,21 @@ class Patient:
                 current_state_index=self.stateMonitor.currentState.value,
                 rng=rng)
 
-            # stop if time to next event (dt) is None
+            # stop if time to next event (dt) is None (i.e. we have reached an absorbing state)
             if dt is None:
                 if_stop = True
 
-            # else if  the next event occurs beyond simulation length
-            elif dt + t > sim_length:
-                if_stop = True
-                # collect cost and health outcomes up to the simulation length
-                self.stateMonitor.costUtilityMonitor.update(time=sim_length,
-                                                            current_state=self.stateMonitor.currentState,
-                                                            next_state=self.stateMonitor.currentState)
             else:
-                # advance time to the time of next event
-                t += dt
+                # else if next event occurs beyond simulation length
+                if dt + t > sim_length:
+                    # advance time to the end of the simulation and stop
+                    t = sim_length
+                    # the individual stays in the current state until the end of the simulation
+                    new_state_index = self.stateMonitor.currentState
+                    if_stop = True
+                else:
+                    # advance time to the time of next event
+                    t += dt
                 # update health state
                 self.stateMonitor.update(time=t, new_state=HealthStates(new_state_index))
 
@@ -61,7 +62,6 @@ class PatientStateMonitor:
         self.currentState = parameters.initialHealthState   # initial health state
         self.survivalTime = None      # survival time
         self.timeToAIDS = None        # time to develop AIDS
-        self.ifDevelopedAIDS = False  # if the patient developed AIDS
         # patient's cost and utility monitor
         self.costUtilityMonitor = PatientCostUtilityMonitor(parameters=parameters)
 
@@ -78,7 +78,6 @@ class PatientStateMonitor:
 
         # update time until AIDS
         if self.currentState != HealthStates.AIDS and new_state == HealthStates.AIDS:
-            self.ifDevelopedAIDS = True
             self.timeToAIDS = time
 
         # update cost and utility
@@ -185,20 +184,20 @@ class CohortOutcomes:
         # record survival time and time until AIDS
         for patient in simulated_patients:
             # survival time
-            if not (patient.stateMonitor.survivalTime is None):
+            if patient.stateMonitor.survivalTime is not None:
                 self.survivalTimes.append(patient.stateMonitor.survivalTime)
             # time until AIDS
-            if patient.stateMonitor.ifDevelopedAIDS:
+            if patient.stateMonitor.timeToAIDS is not None:
                 self.timesToAIDS.append(patient.stateMonitor.timeToAIDS)
             # discounted cost and discounted utility
             self.costs.append(patient.stateMonitor.costUtilityMonitor.totalDiscountedCost)
             self.utilities.append(patient.stateMonitor.costUtilityMonitor.totalDiscountedUtility)
 
         # summary statistics
-        self.statSurvivalTime = Stat.SummaryStat('Survival time', self.survivalTimes)
-        self.statTimeToAIDS = Stat.SummaryStat('Time until AIDS', self.timesToAIDS)
-        self.statCost = Stat.SummaryStat('Discounted cost', self.costs)
-        self.statUtility = Stat.SummaryStat('Discounted utility', self.utilities)
+        self.statSurvivalTime = Stat.SummaryStat(name='Survival time', data=self.survivalTimes)
+        self.statTimeToAIDS = Stat.SummaryStat(name='Time until AIDS', data=self.timesToAIDS)
+        self.statCost = Stat.SummaryStat(name='Discounted cost', data=self.costs)
+        self.statUtility = Stat.SummaryStat(name='Discounted utility', data=self.utilities)
 
         # survival curve
         self.nLivingPatients = Path.PrevalencePathBatchUpdate(
