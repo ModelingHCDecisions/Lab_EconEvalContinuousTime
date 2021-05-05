@@ -8,7 +8,7 @@ import Support as Support
 # create a cohort
 cohort_mono = Cls.Cohort(id=0,
                          pop_size=D.POP_SIZE,
-                         parameters=P.ParametersFixed(therapy=P.Therapies.MONO))
+                         parameters=P.Parameters(therapy=P.Therapies.MONO))
 # simulate the cohort
 cohort_mono.simulate(sim_length=D.SIM_LENGTH)
 
@@ -16,7 +16,7 @@ cohort_mono.simulate(sim_length=D.SIM_LENGTH)
 # create a cohort
 cohort_combo = Cls.Cohort(id=1,
                           pop_size=D.POP_SIZE,
-                          parameters=P.ParametersFixed(therapy=P.Therapies.COMBO))
+                          parameters=P.Parameters(therapy=P.Therapies.COMBO))
 # simulate the cohort
 cohort_combo.simulate(sim_length=D.SIM_LENGTH)
 

@@ -11,7 +11,7 @@ class Therapies(Enum):
     COMBO = 1
 
 
-class ParametersFixed:
+class Parameters:
     def __init__(self, therapy):
 
         # selected therapy

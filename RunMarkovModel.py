@@ -11,7 +11,7 @@ therapy = P.Therapies.COMBO
 # create a cohort
 myCohort = Cls.Cohort(id=1,
                       pop_size=D.POP_SIZE,
-                      parameters=P.ParametersFixed(therapy=therapy))
+                      parameters=P.Parameters(therapy=therapy))
 
 # simulate the cohort over the specified time steps
 myCohort.simulate(sim_length=D.SIM_LENGTH)
