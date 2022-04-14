@@ -1,8 +1,8 @@
 import InputData as D
-import SimPy.Plots.SamplePaths as Path
-import SimPy.Plots.Histogram as Hist
-import SimPy.Statistics as Stat
 import SimPy.EconEval as Econ
+import SimPy.Plots.Histogram as Hist
+import SimPy.Plots.SamplePaths as Path
+import SimPy.Statistics as Stat
 
 
 def print_outcomes(sim_outcomes, therapy_name):
@@ -171,7 +171,10 @@ def report_CEA_CBA(sim_outcomes_mono, sim_outcomes_combo):
     CEA.plot_CE_plane(
         title='Cost-Effectiveness Analysis',
         x_label='Additional QALYs',
-        y_label='Additional Cost'
+        y_label='Additional Cost',
+        x_range=(-1, 5),
+        y_range=(-10000, 90000),
+        interval_type='c'  # to show confidence intervals for cost and effect of each strategy
     )
 
     # report the CE table
