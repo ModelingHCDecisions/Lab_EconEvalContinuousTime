@@ -82,8 +82,7 @@ class PatientStateMonitor:
 
         # update cost and utility
         self.costUtilityMonitor.update(time=time,
-                                       current_state=self.currentState,
-                                       next_state=new_state)
+                                       current_state=self.currentState)
 
         # update current health state
         self.currentState = new_state
@@ -102,11 +101,10 @@ class PatientCostUtilityMonitor:
         self.totalDiscountedCost = 0
         self.totalDiscountedUtility = 0
 
-    def update(self, time, current_state, next_state):
+    def update(self, time, current_state):
         """ updates the discounted total cost and health utility
         :param time: simulation time
         :param current_state: current health state
-        :param next_state: next health state
         """
 
         # cost and utility (per unit of time) during the period since the last recording until now
