@@ -1,9 +1,10 @@
-import InputData as D
-import ParameterClasses as P
-import MarkovModelClasses as Cls
+import deampy.plots.histogram as hist
+import deampy.plots.sample_paths as path
+
+import EconEvalInputData as D
+import EconEvalMarkovModelClasses as Cls
+import EconEvalParamClasses as P
 import Support as Support
-import SimPy.Plots.Histogram as Hist
-import SimPy.Plots.SamplePaths as Path
 
 # selected therapy
 therapy = P.Therapies.COMBO
@@ -17,14 +18,14 @@ myCohort = Cls.Cohort(id=1,
 myCohort.simulate(sim_length=D.SIM_LENGTH)
 
 # plot the sample path (survival curve)
-Path.plot_sample_path(
+path.plot_sample_path(
     sample_path=myCohort.cohortOutcomes.nLivingPatients,
     title='Survival Curve',
     x_label='Time-Step (Year)',
     y_label='Number Survived')
 
 # plot the histogram of survival times
-Hist.plot_histogram(
+hist.plot_histogram(
     data=myCohort.cohortOutcomes.survivalTimes,
     title='Histogram of Patient Survival Time',
     x_label='Survival Time (Year)',

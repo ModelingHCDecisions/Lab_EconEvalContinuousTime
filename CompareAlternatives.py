@@ -1,6 +1,6 @@
-import InputData as D
-import ParameterClasses as P
-import MarkovModelClasses as Cls
+import EconEvalInputData as D
+import EconEvalMarkovModelClasses as Cls
+import EconEvalParamClasses as P
 import Support as Support
 
 

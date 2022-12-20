@@ -1,8 +1,10 @@
 from enum import Enum
+
+import deampy.markov as markov
 import numpy as np
-import InputData as Data
-from InputData import HealthStates
-import SimPy.Markov as Markov
+
+import EconEvalInputData as Data
+from EconEvalInputData import HealthStates
 
 
 class Therapies(Enum):
@@ -72,7 +74,7 @@ def get_trans_prob_matrix(trans_matrix):
 def get_trans_rate_matrix(trans_prob_matrix):
 
     # find the transition rate matrix
-    trans_rate_matrix = Markov.discrete_to_continuous(
+    trans_rate_matrix = markov.discrete_to_continuous(
         trans_prob_matrix=trans_prob_matrix,
         delta_t=1)
 
