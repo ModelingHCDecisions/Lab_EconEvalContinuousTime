@@ -194,7 +194,7 @@ def report_CEA_CBA(sim_outcomes_mono, sim_outcomes_combo):
         if_paired=False
     )
     # show the net monetary benefit figure
-    NBA.plot_incremental_nmbs(
+    NBA.plot_marginal_nmb_lines(
         title='Cost-Benefit Analysis',
         x_label='Willingness-to-pay per QALY ($)',
         y_label='Incremental Net Monetary Benefit ($)',
