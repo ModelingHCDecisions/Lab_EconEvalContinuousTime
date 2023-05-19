@@ -35,9 +35,9 @@ ANNUAL_STATE_COST = [
 
 # annual health utility of each health state
 ANNUAL_STATE_UTILITY = [
-    0.75,   # CD4_200to500
-    0.50,   # CD4_200
-    0.25,   # AIDS
+    0.9,   # CD4_200to500
+    0.85,   # CD4_200
+    0.75,   # AIDS
     0,      # Dead
     ]
 
