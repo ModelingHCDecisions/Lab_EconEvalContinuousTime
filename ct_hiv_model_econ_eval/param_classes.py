@@ -42,6 +42,7 @@ class Parameters:
             # calculate transition probability matrix for the combination therapy
             self.transRateMatrix = get_trans_rate_matrix_combo(
                 rate_matrix_mono=get_trans_rate_matrix(trans_prob_matrix=prob_matrix_mono),
+                prob_matrix_mono=prob_matrix_mono,
                 combo_rr=data.TREATMENT_RR)
 
         # annual state costs and utilities
@@ -92,9 +93,19 @@ def get_trans_rate_matrix(trans_prob_matrix):
     return trans_rate_matrix
 
 
-def get_trans_rate_matrix_combo(rate_matrix_mono, combo_rr):
+def get_hr(p0, rr):
+    """
+    :param p0: (float) the probability of an event in the control group
+    :param rr: (float) relative risk
+    :return: (float) hazard ratio
+    """
+    return np.log(1 - p0 * rr) / np.log(1 - p0)
+
+
+def get_trans_rate_matrix_combo(rate_matrix_mono, prob_matrix_mono, combo_rr):
     """
     :param rate_matrix_mono: (list of lists) transition rate matrix under mono therapy
+    :param prob_matrix_mono: (list of lists) transition probability matrix under mono therapy
     :param combo_rr: relative risk of the combination treatment
     :returns (list of lists) transition rate matrix under combination therapy """
 
@@ -108,7 +119,10 @@ def get_trans_rate_matrix_combo(rate_matrix_mono, combo_rr):
     for s in range(len(matrix_combo)):
         # rates to HIV states
         for next_s in range(s + 1, len(HealthStates)-1):
-            matrix_combo[s][next_s] = combo_rr * rate_matrix_mono[s][next_s]
+            # calculate hazard ratio
+
+            # calculate the rate under combo therapy
+
 
         # rates of background mortality
         matrix_combo[s][-1] = rate_matrix_mono[s][-1]
@@ -118,9 +132,9 @@ def get_trans_rate_matrix_combo(rate_matrix_mono, combo_rr):
 
 # tests
 if __name__ == '__main__':
-    probMatrix = get_trans_prob_matrix(data.TRANS_MATRIX)
-    rateMatrixMono = get_trans_rate_matrix(probMatrix)
-    rateMatrixCombo = get_trans_rate_matrix_combo(rateMatrixMono, data.TREATMENT_RR)
+    probMatrixMono = get_trans_prob_matrix(data.TRANS_MATRIX)
+    rateMatrixMono = get_trans_rate_matrix(probMatrixMono)
+    rateMatrixCombo = get_trans_rate_matrix_combo(rateMatrixMono, probMatrixMono, data.TREATMENT_RR)
 
     print(rateMatrixMono)
     print(rateMatrixCombo)
