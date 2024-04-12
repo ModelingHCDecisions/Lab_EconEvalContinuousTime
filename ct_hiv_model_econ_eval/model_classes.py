@@ -4,7 +4,7 @@ import numpy as np
 from deampy.markov import Gillespie
 from deampy.plots.sample_paths import PrevalencePathBatchUpdate
 
-from EconEvalInputData import HealthStates
+from ct_hiv_model_econ_eval.input_data import HealthStates
 
 
 class Patient:

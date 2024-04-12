@@ -3,8 +3,8 @@ from enum import Enum
 import deampy.markov as markov
 import numpy as np
 
-import EconEvalInputData as Data
-from EconEvalInputData import HealthStates
+import ct_hiv_model_econ_eval.input_data as data
+from ct_hiv_model_econ_eval.input_data import HealthStates
 
 
 class Therapies(Enum):
@@ -24,12 +24,12 @@ class Parameters:
 
         # annual treatment cost
         if self.therapy == Therapies.MONO:
-            self.annualTreatmentCost = Data.Zidovudine_COST
+            self.annualTreatmentCost = data.Zidovudine_COST
         else:
-            self.annualTreatmentCost = Data.Zidovudine_COST + Data.Lamivudine_COST
+            self.annualTreatmentCost = data.Zidovudine_COST + data.Lamivudine_COST
 
         # calculate transition probabilities between hiv states
-        prob_matrix_mono = get_trans_prob_matrix(trans_matrix=Data.TRANS_MATRIX)
+        prob_matrix_mono = get_trans_prob_matrix(trans_matrix=data.TRANS_MATRIX)
 
         # transition probability matrix of the selected therapy
         self.transRateMatrix = []
@@ -42,14 +42,14 @@ class Parameters:
             # calculate transition probability matrix for the combination therapy
             self.transRateMatrix = get_trans_rate_matrix_combo(
                 rate_matrix_mono=get_trans_rate_matrix(trans_prob_matrix=prob_matrix_mono),
-                combo_rr=Data.TREATMENT_RR)
+                combo_rr=data.TREATMENT_RR)
 
         # annual state costs and utilities
-        self.annualStateCosts = Data.ANNUAL_STATE_COST
-        self.annualStateUtilities = Data.ANNUAL_STATE_UTILITY
+        self.annualStateCosts = data.ANNUAL_STATE_COST
+        self.annualStateUtilities = data.ANNUAL_STATE_UTILITY
 
         # discount rate
-        self.discountRate = Data.DISCOUNT
+        self.discountRate = data.DISCOUNT
 
 
 def get_trans_prob_matrix(trans_matrix):
@@ -79,7 +79,7 @@ def get_trans_rate_matrix(trans_prob_matrix):
         delta_t=1)
 
     # calculate background mortality rate
-    mortality_rate = -np.log(1 - Data.ANNUAL_PROB_BACKGROUND_MORT)
+    mortality_rate = -np.log(1 - data.ANNUAL_PROB_BACKGROUND_MORT)
 
     # add background mortality rate
     for row in trans_rate_matrix:
@@ -118,9 +118,9 @@ def get_trans_rate_matrix_combo(rate_matrix_mono, combo_rr):
 
 # tests
 if __name__ == '__main__':
-    probMatrix = get_trans_prob_matrix(Data.TRANS_MATRIX)
+    probMatrix = get_trans_prob_matrix(data.TRANS_MATRIX)
     rateMatrixMono = get_trans_rate_matrix(probMatrix)
-    rateMatrixCombo = get_trans_rate_matrix_combo(rateMatrixMono, Data.TREATMENT_RR)
+    rateMatrixCombo = get_trans_rate_matrix_combo(rateMatrixMono, data.TREATMENT_RR)
 
     print(rateMatrixMono)
     print(rateMatrixCombo)
